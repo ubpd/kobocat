@@ -4,6 +4,11 @@ from __future__ import unicode_literals, print_function, division, absolute_impo
 from onadata.apps.restservice.models import RestService
 from onadata.apps.restservice.tasks import service_definition_task
 
+from urllib.parse import urljoin
+from functools import reduce
+
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 def call_service(parsed_instance):
     # lookup service
@@ -48,15 +53,8 @@ def call_service_otherwise(parsed_instance, otherwise=None):
         service_definition_task.delay(rest_service.pk, data)
 
 
-from urllib.parse import urljoin
-from functools import reduce
-
 def slash_join(*args):
     return reduce(urljoin, args).rstrip("/")
-
-
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 
 def import_from_settings(attr, *args):
     """
