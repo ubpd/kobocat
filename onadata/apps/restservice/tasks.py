@@ -7,7 +7,8 @@ from celery import shared_task
 from django.conf import settings
 
 from onadata.apps.restservice.models import RestService
-
+from .utils import slash_join
+from .utils import import_from_settings
 
 @shared_task(bind=True)
 def service_definition_task(self, rest_service_id, data):
@@ -29,6 +30,26 @@ def service_definition_task(self, rest_service_id, data):
     except Exception as e:
         logger = logging.getLogger("console_logger")
         logger.error("service_definition_task - {}".format(str(e)), exc_info=True)
+        # Countdown is in seconds
+        countdown = 120 * (10 ** self.request.retries)
+        # Max retries is 3 by default.
+        raise self.retry(countdown=countdown, max_retries=settings.REST_SERVICE_MAX_RETRIES)
+
+    return True
+
+@shared_task(bind=True)
+def service_definition_otherwise_task(self, rest_service_id, data):
+    """
+    same as service_definition but for updates
+    """
+    try:
+        rest_service = RestService.objects.get(pk=rest_service_id)
+        service = rest_service.get_service_definition()()
+        service_url = slash_join(rest_service.service_url, import_from_settings('REST_SERVICE_OTHERWISE_SUFFIX','') )
+        service.send(service_url, data)
+    except Exception as e:
+        logger = logging.getLogger("console_logger")
+        logger.error("service_definition_otherwise_task - {}".format(str(e)), exc_info=True)
         # Countdown is in seconds
         countdown = 120 * (10 ** self.request.retries)
         # Max retries is 3 by default.

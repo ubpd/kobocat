@@ -406,6 +406,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True
         },
+        'onadata.apps.viewer.models': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
         'audit_logger': {
             'handlers': ['audit'],
             'level': 'DEBUG',
@@ -425,6 +430,10 @@ THUMB_CONF = {
 }
 # order of thumbnails from largest to smallest
 THUMB_ORDER = ['large', 'medium', 'small']
+
+# suffix to call for hook if entity is not created
+REST_SERVICE_OTHERWISE_ENABLED = True
+REST_SERVICE_OTHERWISE_SUFFIX = "/otherwise"
 
 # Number of times Celery retries to send data to external rest service
 REST_SERVICE_MAX_RETRIES = 3

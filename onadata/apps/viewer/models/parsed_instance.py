@@ -14,7 +14,7 @@ from django.utils.translation import ugettext as _
 
 from onadata.apps.logger.models import Instance
 from onadata.apps.logger.models import Note
-from onadata.apps.restservice.utils import call_service
+from onadata.apps.restservice.utils import call_service, call_service_otherwise, import_from_settings
 from onadata.libs.utils.common_tags import (
     ID,
     UUID,
@@ -32,7 +32,7 @@ from onadata.libs.utils.decorators import apply_form_field_names
 from onadata.libs.utils.model_tools import queryset_iterator
 from onadata.apps.api.mongo_helper import MongoHelper
 
-
+logging.getLogger().info("@@ bp - parsed instance (patch)")
 # this is Mongo Collection where we will store the parsed submissions
 xform_instances = settings.MONGO_DB.instances
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
@@ -356,7 +356,19 @@ class ParsedInstance(models.Model):
         # Rest Services were called before data was saved in DB.
         success = self.update_mongo(asynchronous)
         if success and created:
+            logging.getLogger().info("@@bp - onSave.success")
             call_service(self)
+        else:
+            if import_from_settings('REST_SERVICE_OTHERWISE_ENABLED', False):
+                logging.getLogger().info("@@bp - onSave.otherwise")
+                call_service_otherwise(self, otherwise={
+                    "description": "save.altern",
+                    "otherwise": True,
+                    "pk": self.pk,
+                    "created": created,
+                    "success": success
+                })
+
         return success
 
     def add_note(self, note):
