@@ -8,8 +8,8 @@ from django.conf import settings
 
 from onadata.apps.restservice.models import RestService
 
-from onadata.apps.restservice.utils import import_from_settings
-from onadata.apps.restservice.utils import slash_join
+from onadata.apps.restservice.utils_ext import import_from_settings
+from onadata.apps.restservice.utils_ext import slash_join
 
 @shared_task(bind=True)
 def service_definition_task(self, rest_service_id, data):
