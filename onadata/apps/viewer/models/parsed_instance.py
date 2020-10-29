@@ -14,7 +14,8 @@ from django.utils.translation import ugettext as _
 
 from onadata.apps.logger.models import Instance
 from onadata.apps.logger.models import Note
-from onadata.apps.restservice.utils import call_service, call_service_otherwise, import_from_settings
+from onadata.apps.restservice.utils import call_service, call_service_otherwise
+from onadata.apps.restservice.utils_ext import import_from_settings
 from onadata.libs.utils.common_tags import (
     ID,
     UUID,
