@@ -7,8 +7,7 @@ from celery import shared_task
 from django.conf import settings
 
 from onadata.apps.restservice.models import RestService
-from .utils import slash_join
-from .utils import import_from_settings
+from onadata.apps.restservice.utils import slash_join, import_from_settings
 
 @shared_task(bind=True)
 def service_definition_task(self, rest_service_id, data):
