@@ -4,7 +4,8 @@ from __future__ import unicode_literals, print_function, division, absolute_impo
 from onadata.apps.restservice.models import RestService
 from onadata.apps.restservice.tasks import service_definition_task
 
-from urllib.parse import urljoin
+#from urllib.parse import urljoin # python3
+from urlparse import urljoin # python2
 from functools import reduce
 
 from django.conf import settings
@@ -52,8 +53,10 @@ def call_service_otherwise(parsed_instance, otherwise=None):
             data["otherwise"] = otherwise
         service_definition_task.delay(rest_service.pk, data)
 
-
 def slash_join(*args):
+    """
+    concatenate url fragments
+    """
     return reduce(urljoin, args).rstrip("/")
 
 def import_from_settings(attr, *args):
